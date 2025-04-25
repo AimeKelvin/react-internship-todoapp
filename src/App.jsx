@@ -8,6 +8,13 @@ export default function App() {
     return saved ? JSON.parse(saved) : [];
   });
 
+  const [time, setTime] = useState(new Date());
+
+  useEffect(() => {
+    const interval = setInterval(() => setTime(new Date()), 1000);
+    return () => clearInterval(interval); // cleanup
+  }, []);
+
   useEffect(() => {
     localStorage.setItem("todos", JSON.stringify(todos));
   }, [todos]);
@@ -17,7 +24,9 @@ export default function App() {
   };
 
   const toggleDone = (id) => {
-    setTodos(todos.map(todo => todo.id === id ? { ...todo, done: !todo.done } : todo));
+    setTodos(todos.map(todo => 
+      todo.id === id ? { ...todo, done: !todo.done } : todo
+    ));
   };
 
   const removeTodo = (id) => {
@@ -25,18 +34,31 @@ export default function App() {
   };
 
   return (
-    <div className="min-h-screen bg-blue-50 p-6 flex flex-col items-center">
-      <h1 className="text-3xl font-bold mb-6 text-blue-700">ToDo App</h1>
-      <TodoInput onAdd={addTodo} />
-      <div className="w-full max-w-md mt-6 space-y-4">
-        {todos.map(todo => (
-          <TodoItem
-            key={todo.id}
-            todo={todo}
-            onToggle={() => toggleDone(todo.id)}
-            onRemove={() => removeTodo(todo.id)}
-          />
-        ))}
+    <div className="min-h-screen bg-orange-50 py-10 px-4 flex justify-center items-start">
+      <div className="bg-white shadow-xl rounded-2xl p-6 w-full max-w-md">
+        <div className="flex flex-col items-center mb-6">
+          <h1 className="text-3xl font-bold text-orange-700">🧭 ToDo App</h1>
+          <p className="text-gray-500 text-sm mt-1">
+            {time.toLocaleTimeString()}
+          </p>
+        </div>
+
+        <TodoInput onAdd={addTodo} />
+
+        <div className="mt-6 space-y-3">
+          {todos.length === 0 ? (
+            <p className="text-center text-gray-400">No todos yet. Add one!</p>
+          ) : (
+            todos.map(todo => (
+              <TodoItem
+                key={todo.id}
+                todo={todo}
+                onToggle={() => toggleDone(todo.id)}
+                onRemove={() => removeTodo(todo.id)}
+              />
+            ))
+          )}
+        </div>
       </div>
     </div>
   );
